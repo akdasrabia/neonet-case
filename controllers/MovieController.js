@@ -66,3 +66,47 @@ exports.getMoviesByCategory = async (req, res) => {
     }
     res.json(movies)
 }
+
+
+
+exports.getMoviesMain = async (req, res) => {
+
+    try {
+        console.log(req.query)
+        // const categories = req.query.categories ? JSON.parse(req.query.categories) : [];
+        var recommendedMovies = await Movie.find({isRecommended: 1},  {title: 1, _id: 1, title:1, year: 1, poster: 1, duration: 1, releaseDate: 1, averageRating: 1 }).limit(8);
+        var popularMovies = await Movie.find({isPopular: 1},  {title: 1, _id: 1, title:1, year: 1, poster: 1, duration: 1, releaseDate: 1, averageRating: 1 }).limit(8);
+        var series = await Movie.find({type: "series"},  {title: 1, _id: 1, title:1, year: 1, poster: 1, duration: 1, releaseDate: 1, averageRating: 1 }).limit(8);
+        var movies = await Movie.find({type: "movies"},  {title: 1, _id: 1, title:1, year: 1, poster: 1, duration: 1, releaseDate: 1, averageRating: 1 }).sort('createdAt').limit(8);
+    
+    
+    
+        // for (const element of categories) {
+        //     let doc = await Category.findOne({ name: element.toLocaleLowerCase() }).populate({path: 'movies', select: 'title year poster averageRating'});
+        //     if(doc != null) {
+        //         const uniqueMovies = doc.movies.filter(movie => !movies.some(existingMovie => existingMovie._id.toString() === movie._id.toString()));
+        //         movies.push(...uniqueMovies);
+        //     }
+        // }
+        res.json({recommendedMovies: recommendedMovies, popularMovies: popularMovies, series: series, movies: movies})
+    }catch (err  ) {
+        res.status(404).json({message: err.message})
+    }
+
+}
+
+exports.getMovie = async (req, res) => {
+
+    try{
+        console.log(req.params.id)
+        // const categories = req.query.categories ? JSON.parse(req.query.categories) : [];
+        var movie = await Movie.findOne({_id: req.params.id});
+    
+    
+    
+        res.json(movie)
+    }catch(err){
+        res.status(404).json({message: err.message})
+    }
+   
+}
